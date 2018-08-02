@@ -14,6 +14,8 @@ class App extends Component {
             wallet: undefined,
             network: new Index()
         }
+
+        this.login = this.login.bind(this)
     }
 
 
@@ -29,9 +31,36 @@ class App extends Component {
                     wallet: account.wallet
                 })
             })
-            .catch(err => {
-                console.log("Account creation error: ", err)
+            .catch(() => {
+                account.login()
+                    .then(succ => {
+                        this.setState({
+                            account: account,
+                            account_info: succ,
+                            wallet: account.wallet
+                        })
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
             })
+    }
+
+    login() {
+        let a = this.state.account;
+        let m = this.state.wallet.getMnemonic();
+        a ? a.login(m).then( success => {
+            this.setState({
+                isLoggedIn: true,
+                loginDetails: success
+            })
+        }).catch(err => {
+            this.setState({
+                isLoggedIn: false,
+                loginError: true,
+                loginErrorMessage: err
+            })
+        }) : null
     }
   render() {
     return (
@@ -43,6 +72,13 @@ class App extends Component {
           <div className="row m-3 d-flex justify-content-center">
               <div className="mr-3"><b>My Mnemonic</b></div>
               <div className="">{!!this.state.wallet ? this.state.wallet.getMnemonic() : "Fetching mnemonic..."}</div>
+          </div>
+          <div className="row m-3 d-flex justify-content-center">
+              <button onClick={this.login} className="btn btn-large btn-success">Login, yeah!</button>
+          </div>
+          <div className="row m-3 d-flex justify-content-center">
+              {this.state.isLoggedIn ? <h4>Yew! We just logged into an account with a full functioning wallet using just 12 words!</h4> :
+                  this.state.loginError ? <h4>I blame someone else</h4> : "waiting for you to click the login button!" }
           </div>
       </div>
     );
