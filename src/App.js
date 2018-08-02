@@ -50,9 +50,14 @@ class App extends Component {
         let a = this.state.account;
         let m = this.state.wallet.getMnemonic();
         a ? a.login(m).then( success => {
+            let addresses = [];
+            for (let i = 0; i <= 5; i++) {
+                addresses.push(a.wallet.getCoin("bitcoin").getAddress(0, 0, i).getPublicAddress())
+            }
             this.setState({
                 isLoggedIn: true,
-                loginDetails: success
+                loginDetails: success,
+                addresses
             })
         }).catch(err => {
             this.setState({
@@ -79,6 +84,31 @@ class App extends Component {
           <div className="row m-3 d-flex justify-content-center">
               {this.state.isLoggedIn ? <h4>Yew! We just logged into an account with a full functioning wallet using just 12 words!</h4> :
                   this.state.loginError ? <h4>I blame someone else</h4> : "waiting for you to click the login button!" }
+          </div>
+
+          <div className="row m-3 d-flex center">
+              <table className="table">
+                  <thead className="thead-dark">
+                  <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Bitcoin Address</th>
+
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {!!this.state.addresses ? this.state.addresses.map( (a,i) => {
+                          return (<tr key={i}>
+                              <th scope="row">{i}</th>
+                              <td>{a}</td>
+                          </tr>)
+                      }) :
+                      <tr>
+                          <th scope="row">0</th>
+                          <td>Addr</td>
+                      </tr>
+                  }
+                  </tbody>
+              </table>
           </div>
       </div>
     );
