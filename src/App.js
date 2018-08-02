@@ -16,6 +16,7 @@ class App extends Component {
         }
 
         this.login = this.login.bind(this)
+        this.fetchArtifacts = this.fetchArtifacts.bind(this)
     }
 
 
@@ -67,6 +68,17 @@ class App extends Component {
             })
         }) : null
     }
+    fetchArtifacts() {
+        this.state.network.getLatestArtifacts(22)
+            .then(arts => {
+                this.setState({
+                    artifacts: arts
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
   render() {
     return (
       <div className="App">
@@ -110,6 +122,40 @@ class App extends Component {
                   </tbody>
               </table>
           </div>
+          <div className="row m-3 d-flex justify-content-center">
+              <button onClick={this.fetchArtifacts} className="btn btn-large btn-danger">Let's fetch some artifacts</button>
+          </div>
+          <hr className="my-5" />
+          <div className="row m-3 d-flex justify-content-center">
+              <table className="table">
+                  <thead className="thead-dark">
+                  <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">TXID</th>
+                      <th scope="col">Title</th>
+                      <th scope="col">Artist</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {!!this.state.artifacts ? this.state.artifacts.map( (art, i) => {
+                      return (
+                          <tr key={i}>
+                              <th scope="row">{i}</th>
+                              <td>{art.getTXID()}</td>
+                              <td>{art.getTitle()}</td>
+                              <td>{art.getDetail("artist")}</td>
+                          </tr>
+                      )
+                  }) : <tr>
+                      <th scope="row">0</th>
+                      <td>TXID</td>
+                      <td>Title</td>
+                      <td>Artist</td>
+                  </tr>}
+                  </tbody>
+              </table>
+          </div>
+
       </div>
     );
   }
